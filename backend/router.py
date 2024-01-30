@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from auth_bearer import JWTBearer
 from database import get_db
-from service import create_user, db_get_user_by_id, db_get_user_by_email, db_delete_user_by_id, get_list_of_users
-from auth_handler import login_user_token
-from dto_model import UserCreateDTO, UserDTO, LoginDTO
-
+from service import create_user, db_get_user_by_id, db_get_user_by_email, db_delete_user_by_id, get_list_of_users, \
+    user_verification
+from auth_handler import login_user_token, create_access_token
+from dto_model import UserCreateDTO, UserDTO, LoginDTO, Token
 
 router = APIRouter()
 
@@ -24,6 +25,14 @@ async def login(login_data: LoginDTO, db: Session = Depends(get_db), tags=["web"
 def  home(db: Session = Depends(get_db)):
     users= get_list_of_users(db)
     return users
+
+# @router.post("/token", response_model=Token, tags=["web"])
+# async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),db: Session = Depends(get_db)):
+#     user = user_verification(form_data,db)
+#
+#     access_token = create_access_token(form_data)
+#     return {"access_token": access_token, "token_type": "bearer"}
+
 
 #Testing
 @router.get("/api/user/{id}", response_model=UserDTO , tags=["test"])
