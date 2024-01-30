@@ -119,3 +119,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 async def login_user_token(login_data: LoginDTO, db: Session = Depends(get_db)):
     user = await user_verification(login_data, db)
     return await create_access_token(user)
+
+def get_list_of_users(db: Session = Depends()):
+    return  db.query(User).all()
+

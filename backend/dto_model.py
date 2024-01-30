@@ -17,7 +17,6 @@ class UserDTO(BaseModel):
     id: int
     email: str
 
-
 class LoginDTO(BaseModel):
     email: str
     password: str
