@@ -2,7 +2,7 @@ from http import HTTPStatus
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from db_model import User
-from dto_model import UserCreateDTO, UserDTO, CustomException, LoginDTO
+from dto_model import UserCreateDTO, UserDTO, CustomException, LoginDTO, NewPassword
 from fastapi import Depends
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -71,3 +71,15 @@ async def user_verification(login_data: LoginDTO, db: Session) -> UserDTO:
 
 def get_list_of_users(db: Session = Depends()):
     return db.query(User).all()
+
+
+async def db_update_user_password(user_id: int, new_password: NewPassword, db: Session):
+    user = db.query(User).filter(User.id == user_id).first()
+    if user is not None:
+        if new_password is not None:
+            hashed_password = await get_password_hash(new_password.new_password)
+            user.password = hashed_password
+
+            db.commit()
+    else:
+        raise CustomException(HTTPStatus.NOT_FOUND, "User not found")
